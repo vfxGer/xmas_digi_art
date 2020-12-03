@@ -2,10 +2,21 @@ from matplotlib.pyplot import imsave, imshow
 import random
 from pprint import pprint
 from sys import maxsize
+from PIL import Image
+import numpy as np
 
 WIDTH = 1024
 HEIGHT = 1024
 NUM_SPOTS = 100
+
+COLOR_PALETTE = [
+	[0.0859375,  0.35546875, 0.19921875],
+	[0.078125,   0.41796875, 0.2265625],
+	[0.96875,    0.6953125,  0.16015625],
+	[0.73046875, 0.14453125, 0.15625],
+	[0.9140625,  0.2734375,  0.1875]
+	]
+
 
 def create_random_spots():
 	x = random.sample(range(WIDTH), NUM_SPOTS)
@@ -14,17 +25,20 @@ def create_random_spots():
 	points.sort()
 	colours = {}
 	for p in points:
-		colours[p] = random.sample(range(255), 3)
+		# colours[p] = [random.uniform(0, 1) for _ in range(3)]
+		colours[p] = random.choice(COLOR_PALETTE)
 	return colours
 
 
 def squared_dist(p1, p2):
-	res = (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2
+	return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+	# res = (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2
+
 	# print("(%d - %d)**2 + (%d - %d)**2=%d"%(p1[0], p2[0], p1[1], p2[1], res) )
 	# print(p1)
 	# print(p2)
 	# print(res)
-	return res
+	# return res
 
 
 def test():
@@ -40,10 +54,7 @@ def test():
 
 def main():
 	colours = create_random_spots()
-	row = [0] * WIDTH
-	img_arr = []
-	for _ in range(HEIGHT):
-		img_arr.append(row.copy())
+	img_arr = np.zeros((WIDTH, HEIGHT, 3))
 	pprint(colours)
 	# pprint(img_arr)
 	for y in range(WIDTH):
@@ -51,7 +62,7 @@ def main():
 			# print([x,y])
 			min_dist = maxsize
 			for p in colours:
-				d = squared_dist([x,y], p)
+				d = (x - p[0])**2 + (y - p[1])**2
 				if d < min_dist:
 					min_dist = d
 					# if d==0:
@@ -67,6 +78,9 @@ def main():
 	# redline = [red] * 1024
 	# redimage = [redline] * 1024
 	imsave("ver1.png", img_arr)
+	im = Image.fromarray((img_arr * 255).astype(np.uint8))
+	# im = Image.fromarray(img_arr)
+	im.save("pillow.png")
 
 if __name__=="__main__":
 	main()
