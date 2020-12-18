@@ -25,20 +25,12 @@ def create_random_spots():
 	points.sort()
 	colours = {}
 	for p in points:
-		# colours[p] = [random.uniform(0, 1) for _ in range(3)]
 		colours[p] = random.choice(COLOR_PALETTE)
 	return colours
 
 
 def squared_dist(p1, p2):
 	return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
-	# res = (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2
-
-	# print("(%d - %d)**2 + (%d - %d)**2=%d"%(p1[0], p2[0], p1[1], p2[1], res) )
-	# print(p1)
-	# print(p2)
-	# print(res)
-	# return res
 
 
 def test():
@@ -56,30 +48,13 @@ def main():
 	colours = create_random_spots()
 	img_arr = np.zeros((WIDTH, HEIGHT, 3))
 	pprint(colours)
-	# pprint(img_arr)
 	for y in range(WIDTH):
 		for x in range(HEIGHT):
-			# print([x,y])
-			min_dist = maxsize
-			for p in colours:
-				d = (x - p[0])**2 + (y - p[1])**2
-				if d < min_dist:
-					min_dist = d
-					# if d==0:
-					# # # 	print((x,y))
-					#   	img_arr[y][x] = "x"
-					# else:
-					img_arr[y][x] = colours[p]
-					# print("Setting %d, %d to %d"%(x,y,colours[p]))
-					# print("----------")
+			min_p = min(((x - p[0])**2 + (y - p[1])**2, p) for p in colours)
+			img_arr[y][x] = colours[min_p[1]]
 		print( "%.2f%%" %(((y+1)/WIDTH)*100))
-	# pprint(img_arr)
-	# red = (1.0,0.0,0.0)
-	# redline = [red] * 1024
-	# redimage = [redline] * 1024
 	imsave("ver1.png", img_arr)
 	im = Image.fromarray((img_arr * 255).astype(np.uint8))
-	# im = Image.fromarray(img_arr)
 	im.save("pillow.png")
 
 if __name__=="__main__":
